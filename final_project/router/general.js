@@ -6,7 +6,7 @@ const public_users = express.Router();
 
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
+  //Register as user 
   return res.status(300).json({message: "Yet to be implemented"});
 });
 

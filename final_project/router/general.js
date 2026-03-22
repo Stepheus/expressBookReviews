@@ -12,8 +12,17 @@ function formatBook(data){
 
 public_users.post("/register", (req,res) => {
   //Register as user 
-  return res.status(300).json({message: "Yet to be implemented"});
-});
+  const {username, password} = req.body;
+  if (username && password){
+    if (isValid(username)){
+        users.push({username, password});
+        res.status(200).json({message: `user: ${username} has been successfully added.`});
+      } else {
+        res.status(404).json({message: `username: ${username} already exists.`});}
+  } else{
+    res.status(404).json({message: "Please enter a username and password"});}
+  });
+
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {

@@ -2,7 +2,9 @@ const express = require('express');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
+const axios = require("axios");
 const public_users = express.Router();
+
 
 function formatBook(data){
     data = JSON.stringify(data);
@@ -25,9 +27,17 @@ public_users.post("/register", (req,res) => {
 
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-return res.status(200).send(JSON.stringify({books},null, 4));
+public_users.get('/', function (req, res) {
+  //Without promise
+    return res.status(200).send(JSON.stringify({books},null, 4));
+    // try {
+    //     let response = await apiClient.get('router/booksdb.js');
+    //     res.status(200).json({data: response.data});
+        
+    // } catch (error) {
+    //     res.status(404).json({error: error});      
+    // }
+    
 });
 
 // Get book details based on ISBN
@@ -62,10 +72,8 @@ public_users.get('/title/:title',function (req, res) {
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  let isbn = req.params.isbn;
-  books = formatBook(books);
-  let filteredReview = books[isbn].reviews;
-  return res.status(200).send(JSON.stringify(filteredReview, null, 4));
+  let isbn = parseInt(req.params.isbn);
+  return res.status(200).send(JSON.stringify(books[isbn].reviews, null, 4));
 });
 
 module.exports.general = public_users;

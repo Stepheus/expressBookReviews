@@ -127,7 +127,7 @@ public_users.get('/title/:title',function (req, res) {
         if (Object.keys(titleBooks).length > 0){
             resolve(titleBooks);
         } else {
-            reject(new Error("No book with this author found."));
+            reject(new Error("No book with this title found."));
         }
     });
 

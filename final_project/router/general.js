@@ -2,7 +2,6 @@ const express = require('express');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
-const axios = require("axios");
 const public_users = express.Router();
 
 
@@ -29,15 +28,23 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/', function (req, res) {
   //Without promise
-    return res.status(200).send(JSON.stringify({books},null, 4));
-    // try {
-    //     let response = await apiClient.get('router/booksdb.js');
-    //     res.status(200).json({data: response.data});
-        
-    // } catch (error) {
-    //     res.status(404).json({error: error});      
-    // }
+    // return res.status(200).send(JSON.stringify({books},null, 4));
+
+    //with promises
+    let allBookPromise = new Promise((resolve, reject) => {
+        if (books.length > 0){
+            resolve();
+        }else{
+            reject(new Error("No books in the database."));
+        }
+    });
     
+    allBookPromise.then(()=>{
+        return res.status(200).send(JSON.stringify({books},null, 4));
+    })
+    .catch((error)=>{
+        return res.status(500).json({message: error.message});
+    })
 });
 
 // Get book details based on ISBN

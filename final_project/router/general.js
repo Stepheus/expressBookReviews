@@ -11,6 +11,10 @@ function formatBook(data){
     return data;
 }
 
+const isNumeric = (str)=>{
+    return typeof str === "string" && Number.isFinite(+str);
+};
+
 public_users.post("/register", (req,res) => {
   //Register as user 
   const {username, password} = req.body;
@@ -49,10 +53,31 @@ public_users.get('/', function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  let isbn = req.params.isbn;
-  let isbnBook = books[isbn];
-  return res.status(200).send(JSON.stringify(isbnBook));
+    let isbn = req.params.isbn;;
+    if (!isNumeric(isbn)){
+        return res.status(404).json({message: "Isbn value incorrect. Please enter an number."})
+    }
+    
+    let isbnBook = books[isbn]; 
+    //Without Promise
+//   return res.status(200).send(JSON.stringify(isbnBook));
+
+  //With Promise
+    let isbnPromise = new Promise((resolve, reject) => {     
+        if(isbnBook){
+            resolve();
+        }else{
+            reject(new Error("Book with this isbn does not exist in the database"));
+        }
+
+  });
+
+  isbnPromise.then(()=>{
+    res.status(200).json(isbnBook);
+  })
+  .catch((error)=>{
+    res.status(404).json({message: error.message});
+  })
  });
   
 // Get book details based on author

@@ -97,7 +97,7 @@ public_users.get('/author/:author',function (req, res) {
     //With promise
     let authorPromise = new Promise((resolve, reject) => {
         let filteredBook = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.author.toLowerCase() === name.toLowerCase()));
-        if (filteredBook.length > 0){
+        if (Object.keys(filteredBook).length > 0){
             resolve(filteredBook);
         }else{
             reject(new Error("Author not find"));
@@ -115,9 +115,29 @@ public_users.get('/author/:author',function (req, res) {
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     const name = req.params.title;
-    books = formatBook(books);
-    let filteredBook = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.title.toLowerCase() === name.toLowerCase()));
-    return res.status(200).send(JSON.stringify(filteredBook, null, 4));
+    books = formatBook(books); //objectify the book!
+
+    //Without Promise
+    // let filteredBook = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.title.toLowerCase() === name.toLowerCase()));
+    // return res.status(200).send(JSON.stringify(filteredBook, null, 4));
+
+    //With Promise
+    let titlePromise = new Promise((resolve, reject) => {
+        let titleBooks = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.title.toLowerCase() === name.toLowerCase()));
+        if (Object.keys(titleBooks).length > 0){
+            resolve(titleBooks);
+        } else {
+            reject(new Error("No book with this author found."));
+        }
+    });
+
+    titlePromise.then((titleBooks)=>{
+        return res.status(200).send(JSON.stringify(titleBooks, null, 4));
+    })
+    .catch((error)=>{
+        return res.status(404).json({message: error.message});
+    })
+
 });
 
 //  Get book review

@@ -58,21 +58,23 @@ public_users.get('/isbn/:isbn',function (req, res) {
         return res.status(404).json({message: "Isbn value incorrect. Please enter an number."})
     }
     
-    let isbnBook = books[isbn]; 
+     
     //Without Promise
+    // let isbnBook = books[isbn];
 //   return res.status(200).send(JSON.stringify(isbnBook));
 
   //With Promise
     let isbnPromise = new Promise((resolve, reject) => {     
+        let isbnBook = books[isbn];
         if(isbnBook){
-            resolve();
+            resolve(isbnBook);
         }else{
             reject(new Error("Book with this isbn does not exist in the database"));
         }
 
   });
 
-  isbnPromise.then(()=>{
+  isbnPromise.then((isbnBook)=>{
     res.status(200).json(isbnBook);
   })
   .catch((error)=>{
@@ -84,14 +86,30 @@ public_users.get('/isbn/:isbn',function (req, res) {
 public_users.get('/author/:author',function (req, res) {
     const name = req.params.author;
 
-    //formating the data for manipulation
+    //formating the data for manipulation (A full Object)
     books = formatBook(books);
 
-    //accessing value needed
-   let filteredBook = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.author.toLowerCase() === name.toLowerCase()));
-
+    //Without promise
+//    let filteredBook = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.author.toLowerCase() === name.toLowerCase()));
    
-    return res.status(200).send(JSON.stringify(filteredBook, null, 4));
+//     return res.status(200).send(JSON.stringify(filteredBook, null, 4));
+
+    //With promise
+    let authorPromise = new Promise((resolve, reject) => {
+        let filteredBook = Object.fromEntries(Object.entries(books).filter(([key, value])=> value.author.toLowerCase() === name.toLowerCase()));
+        if (filteredBook.length > 0){
+            resolve(filteredBook);
+        }else{
+            reject(new Error("Author not find"));
+        }
+    });
+
+    authorPromise.then((filteredBook)=>{
+        return res.status(200).send(JSON.stringify(filteredBook, null, 4));
+    })
+    .catch((error)=> {
+       return res.status(404).json({message: error.message});
+    });
 });
 
 // Get all books based on title
